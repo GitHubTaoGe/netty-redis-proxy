@@ -43,9 +43,9 @@ public class RedisServiceImpl<K, V> implements RedisService<K, V> {
     }
 
     @Override
-    public boolean set(K key, V value, int second) {
+    public boolean set(K key, V value, int milliseconds) {
         try {
-            redisson.getBucket((String) key).set(value, second, TimeUnit.MILLISECONDS);
+            redisson.getBucket((String) key).set(value, milliseconds, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
             return false;
         }

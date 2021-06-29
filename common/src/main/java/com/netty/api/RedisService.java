@@ -7,5 +7,5 @@ public interface RedisService<K, V> extends Redis<K, V> {
 
     public boolean set(K key, V value);
 
-    public boolean set(K key, V value, int second);
+    public boolean set(K key, V value, int milliseconds);
 }

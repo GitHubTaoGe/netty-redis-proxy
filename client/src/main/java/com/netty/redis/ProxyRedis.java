@@ -26,7 +26,7 @@ public class ProxyRedis<K, V> implements RedisService<K, V> {
     }
 
     @Override
-    public boolean set(Object key, Object value, int second) {
-        return redisService.set(key, value, second);
+    public boolean set(Object key, Object value, int milliseconds) {
+        return redisService.set(key, value, milliseconds);
     }
 }

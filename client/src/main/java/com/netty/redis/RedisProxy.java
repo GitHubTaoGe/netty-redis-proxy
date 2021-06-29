@@ -107,7 +107,7 @@ class MethodProxy implements InvocationHandler, RedisService {
     }
 
     @Override
-    public boolean set(Object key, Object value, int second) {
+    public boolean set(Object key, Object value, int milliseconds) {
         ClientRequest clientRequest = new ClientRequest();
 
         clientRequest.setCommand(Command.SETEX.getCommand());
@@ -116,7 +116,7 @@ class MethodProxy implements InvocationHandler, RedisService {
 
         redisMsg.setKey(key);
         redisMsg.setData(value);
-        redisMsg.setMillisecond(second);
+        redisMsg.setMillisecond(milliseconds);
         redisMsg.setType(value.getClass().getTypeName());
 
         clientRequest.setContent(redisMsg);
