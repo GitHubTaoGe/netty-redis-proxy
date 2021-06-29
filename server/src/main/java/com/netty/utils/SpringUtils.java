@@ -1,4 +1,4 @@
-package netty.utils;
+package com.netty.utils;
 
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.BeansException;

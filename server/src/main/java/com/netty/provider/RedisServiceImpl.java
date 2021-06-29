@@ -1,4 +1,4 @@
-package netty.provider;
+package com.netty.provider;
 
 import com.netty.api.RedisService;
 import org.redisson.api.RedissonClient;

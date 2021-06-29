@@ -1,4 +1,4 @@
-package netty.handler;
+package com.netty.handler;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
