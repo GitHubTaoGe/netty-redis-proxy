@@ -34,6 +34,8 @@ public class TcpNettyServer extends Thread{
 
     }
 
+    public TcpNettyServer() {
+    }
 
     public TcpNettyServer(int port) {
         this.port = port;
