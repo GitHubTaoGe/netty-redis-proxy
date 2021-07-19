@@ -38,7 +38,7 @@ public class TcpNettyClient  {
             DefaultFuture defaultFuture = new DefaultFuture(request);
 
             //通过请求ID，获取对应的响应处理结果
-            Response response = defaultFuture.get(10);
+            Response response = defaultFuture.get();
             return response;
         }catch(Exception e){
             e.printStackTrace();

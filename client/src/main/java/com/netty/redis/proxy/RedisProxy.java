@@ -1,6 +1,5 @@
 package com.netty.redis.proxy;
 
-import com.netty.api.Redis;
 import com.netty.api.RedisService;
 import com.netty.bean.ClientRequest;
 import com.netty.bean.Response;
@@ -65,7 +64,7 @@ class MethodProxy implements InvocationHandler, RedisService {
 
         RedisMsg content = response.getContent();
 
-        return content.getData();
+        return content == null ? null : content.getData();
 
     }
 

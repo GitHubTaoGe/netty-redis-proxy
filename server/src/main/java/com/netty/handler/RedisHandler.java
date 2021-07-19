@@ -72,18 +72,27 @@ public class RedisHandler extends ChannelInboundHandlerAdapter {
             Object invoke = m.invoke(redisService, objects.toArray());
 
             //写入解析请求之后结果对应的响应信息
-            Response response = new Response();
+            Response<RedisMsg> response = new Response();
 
             response.setId(request.getId());
 
+            RedisMsg redisResult = new RedisMsg();
+
             if (invoke instanceof Boolean) {
-                RedisMsg res = new RedisMsg();
-                res.setData(invoke);
-                response.setContent(res);
+
+                redisResult.setData(invoke);
+
+                response.setContent(redisResult);
+
+            } else if (null == invoke) {
+
+                redisResult.setData(null);
+
+                response.setContent(redisResult);
 
             } else if (invoke instanceof RedisMsg) {
 
-                response.setContent(invoke);
+                response.setContent((RedisMsg) invoke);
             }
 
             String result = JSONObject.toJSONString(response);

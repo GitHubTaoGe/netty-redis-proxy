@@ -1,6 +1,6 @@
 proxy:
   redis:
-    clientId: aac
+    clientId: proxy-client-dev
     hots: 127.0.0.1
     port: 8080
 

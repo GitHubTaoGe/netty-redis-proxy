@@ -34,25 +34,27 @@ public class DefaultFuture {
     //线程通知条件
     private volatile Condition condition = lock.newCondition();
 
-
     public DefaultFuture(ClientRequest request) {
-        id = request.getId();//获取对应的请求ID
-        FUTURES.put(id, this);//存储当前的请求ID对应的上下文信息
+        this(request, 134000);
+    }
+
+    public DefaultFuture(ClientRequest request, long timeout) {
+        this.timeout = timeout;//设置当前请求超时时间
+        this.id = request.getId();//获取对应的请求ID
+        FUTURES.put(request.getId(), this);//存储当前的请求ID对应的上下文信息
     }
 
 
     /**
      * 根据请求id获取响应结果
      *
-     * @param timeout
      * @return
      */
-    public Response get(long timeout) {
-        long start = System.currentTimeMillis();
+    public Response get() {
         lock.lock();//先锁
         while (!hasDone()) {
             try {
-                condition.await(timeout, TimeUnit.SECONDS);
+                await(timeout);
                 if (System.currentTimeMillis() - start >= timeout) {
                     break;
                 }
@@ -63,6 +65,14 @@ public class DefaultFuture {
             }
         }
         return response;
+    }
+
+    private void await(long timeout) throws InterruptedException {
+        if (timeout > 0) {
+            condition.await(timeout, TimeUnit.MILLISECONDS);
+        }else {
+            condition.await();
+        }
     }
 
     /**
@@ -96,7 +106,7 @@ public class DefaultFuture {
 
 
     private boolean hasDone() {
-        return response != null ? true : false;
+        return response != null;
     }
 
     public long getId() {
@@ -136,15 +146,18 @@ public class DefaultFuture {
         public void run() {
 
             while (true) {
+
                 for (long futureId : FUTURES.keySet()) {
                     DefaultFuture f = FUTURES.get(futureId);
+
                     if (f == null) {
                         FUTURES.remove(futureId);//为空的话 代表请求结果已经处理完毕了
                         continue;
                     }
+
                     if (f.getTimeout() > 0) {
                         if ((System.currentTimeMillis() - f.getStart()) > f.getTimeout()) {
-                            Response res = new Response();
+                            Response<Object> res = new Response();
                             res.setContent(null);
                             res.setMsg("请求超时！");
                             res.setStatus(1);//响应异常处理
@@ -152,11 +165,13 @@ public class DefaultFuture {
                             DefaultFuture.recive(res);//存储服务端的响应结果信息
                         }
                     }
-
-
                 }
 
-
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -166,8 +181,11 @@ public class DefaultFuture {
      * 设置为后台线程
      */
     static {
+
         FutureTimeOutThread timeOutThread = new FutureTimeOutThread();
+
         timeOutThread.setDaemon(true);
+
         timeOutThread.start();
 
     }
