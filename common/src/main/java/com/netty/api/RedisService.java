@@ -1,7 +1,7 @@
 package com.netty.api;
 
-public interface RedisService<K, V> extends Redis<K, V> {
-    public V get(K key);
+public interface RedisService<K, V> {
+    public  V get(K key);
 
     public boolean del(K key);
 

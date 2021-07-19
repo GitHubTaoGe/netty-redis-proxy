@@ -5,11 +5,14 @@ package com.netty.bean;
  * 封装服务端的请求
  */
 public class ServerRequest<T> {
+    private  long id;
+
+    //客户端id
+    private String clientId;
+
     private String command;
 
     private T content;
-
-    private  long id;
 
     public long getId() {
         return id;
@@ -17,6 +20,14 @@ public class ServerRequest<T> {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
     }
 
     public T getContent() {

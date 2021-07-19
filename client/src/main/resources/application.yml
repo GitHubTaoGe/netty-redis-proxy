@@ -1,4 +1,8 @@
-redis:
-  secret: aac
-  hots: 127.0.0.1
-  port: 8080
+proxy:
+  redis:
+    clientId: aac
+    hots: 127.0.0.1
+    port: 8080
+
+server:
+  port: 8088

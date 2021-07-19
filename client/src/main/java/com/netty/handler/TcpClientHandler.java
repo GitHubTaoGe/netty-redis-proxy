@@ -1,7 +1,7 @@
 package com.netty.handler;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
 import com.netty.bean.DefaultFuture;
 import com.netty.bean.Response;
 import com.netty.msg.RedisMsg;
@@ -32,43 +32,43 @@ public class TcpClientHandler extends ChannelInboundHandlerAdapter {
             ctx.channel().writeAndFlush("ping\r\n");
             return ;
         }
-        log.debug("Redis客户端获取到服务端响应数据:{}", msg.toString());
+        log.info("Redis客户端获取到服务端响应数据:{}", msg.toString());
 
         String str = getJSONObject(msg.toString()).toString();
 
         //读取服务端的响应结果
-        Response res = JSONObject.parseObject(str, Response.class);
+        Response<RedisMsg> response = JSONObject.parseObject(str, new TypeReference<Response<RedisMsg>>() {});
 
 
-        Object data = res.getContent();
+        RedisMsg data = response.getContent();
 
-        if (data == null) {
-            DefaultFuture.recive(res);
+        if (data.getType() == null) {
+            DefaultFuture.recive(response);
             return;
         }
 
-        if (isPrimitive(data.getClass())) {
-            DefaultFuture.recive(res);
+        if (isPrimitive(data.getData().getClass())) {
+            DefaultFuture.recive(response);
             return;
         }
 
         try {
-            RedisMsg redisMsg = JSONObject.parseObject(JSON.toJSONBytes(data), RedisMsg.class);
+            Class<?> responseType = Class.forName(data.getType());
 
-            Class<?> responseType = Class.forName(redisMsg.getType());
 
-            Object parseObject = JSONObject.parseObject(JSONObject.toJSONString(redisMsg.getData()), responseType);
+            Object parseObject = JSONObject.parseObject(JSONObject.toJSONString(data.getData()), responseType);
+            JSONObject.parseObject(JSONObject.toJSONString(data.getData()), responseType);
 
-            res.setContent(parseObject);
-            DefaultFuture.recive(res);
+            data.setData(parseObject);
+
+            response.setContent(data);
+            DefaultFuture.recive(response);
             return;
         } catch (ClassNotFoundException e) {
 
         }
-
-
         //存储响应结果
-        DefaultFuture.recive(res);
+        DefaultFuture.recive(response);
     }
 
     private JSONObject getJSONObject(String str){

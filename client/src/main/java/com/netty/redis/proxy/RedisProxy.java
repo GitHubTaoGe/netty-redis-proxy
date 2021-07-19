@@ -1,8 +1,10 @@
-package com.netty.redis;
+package com.netty.redis.proxy;
 
+import com.netty.api.Redis;
 import com.netty.api.RedisService;
-import com.netty.client.TcpNettyClient;
 import com.netty.bean.ClientRequest;
+import com.netty.bean.Response;
+import com.netty.client.TcpNettyClient;
 import com.netty.command.Command;
 import com.netty.msg.RedisMsg;
 
@@ -11,9 +13,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 public class RedisProxy {
-    public static <T> T create(Class<?> clazz) {
+    public static <T> T create(String clientId, Class<?> clazz) {
 
-        MethodProxy methodProxy = new MethodProxy(clazz);
+        MethodProxy methodProxy = new MethodProxy(clientId, clazz);
 
         T result = (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz}, methodProxy);
 
@@ -27,7 +29,10 @@ class MethodProxy implements InvocationHandler, RedisService {
 
     private Class<?> clazz;
 
-    public MethodProxy(Class<?> clazz) {
+    private String clientId;
+
+    public MethodProxy(String clientId, Class<?> clazz) {
+        this.clientId = clientId;
         this.clazz = clazz;
     }
 
@@ -54,8 +59,13 @@ class MethodProxy implements InvocationHandler, RedisService {
 
 
     public Object rpcInvoke(ClientRequest clientRequest) {
+        clientRequest.setClientId(this.clientId);
 
-        return TcpNettyClient.send(clientRequest);
+        Response<RedisMsg> response = TcpNettyClient.send(clientRequest);
+
+        RedisMsg content = response.getContent();
+
+        return content.getData();
 
     }
 

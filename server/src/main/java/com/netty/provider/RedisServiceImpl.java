@@ -1,5 +1,6 @@
 package com.netty.provider;
 
+import com.netty.api.Redis;
 import com.netty.api.RedisService;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class RedisServiceImpl<K, V> implements RedisService<K, V> {
+public class RedisServiceImpl<K, V> implements Redis<K, V> {
 
     private RedissonClient redisson;
     @Autowired

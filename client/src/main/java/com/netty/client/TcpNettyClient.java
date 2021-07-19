@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.netty.bean.ClientRequest;
 import com.netty.bean.DefaultFuture;
 import com.netty.bean.Response;
+import com.netty.msg.RedisMsg;
 import io.netty.channel.ChannelFuture;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -23,9 +24,9 @@ public class TcpNettyClient  {
     }
 
     //发送数据的方法
-    public static Object send(ClientRequest request){
+    public static Response send(ClientRequest request){
         try{
-            log.debug("Redis客户端向服务端发送请求数据:{}", JSONObject.toJSONString(request));
+            log.info("Redis客户端向服务端发送请求数据:{}", JSONObject.toJSONString(request));
 
             //客户端直接发送请求数据到服务端
             future.channel().writeAndFlush(JSONObject.toJSONString(request));
@@ -38,7 +39,7 @@ public class TcpNettyClient  {
 
             //通过请求ID，获取对应的响应处理结果
             Response response = defaultFuture.get(10);
-            return response.getContent();
+            return response;
         }catch(Exception e){
             e.printStackTrace();
         }

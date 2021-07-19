@@ -1,14 +1,18 @@
 package com.netty.redis;
 
+import com.netty.api.Redis;
 import com.netty.api.RedisService;
+import com.netty.redis.proxy.RedisProxy;
 
-public class ProxyRedis<K, V> implements RedisService<K, V> {
+public class ProxyRedis<K, V> implements Redis<K, V>, RedisService<K, V> {
 
-    private static RedisService redisService;
 
-    static {
-        redisService = RedisProxy.create(RedisService.class);
+    private RedisService redisService;
+
+    public ProxyRedis(String clientId) {
+        this.redisService = RedisProxy.create(clientId, RedisService.class);
     }
+
 
     @Override
     public V get(Object key) {
@@ -16,17 +20,18 @@ public class ProxyRedis<K, V> implements RedisService<K, V> {
     }
 
     @Override
-    public boolean del(Object key) {
+    public boolean del(K key) {
         return redisService.del(key);
     }
 
     @Override
-    public boolean set(Object key, Object value) {
+    public boolean set(K key, V value) {
+
         return redisService.set(key, value);
     }
 
     @Override
-    public boolean set(Object key, Object value, int milliseconds) {
+    public boolean set(K key, V value, int milliseconds) {
         return redisService.set(key, value, milliseconds);
     }
 }
